@@ -5,3 +5,4 @@ openai==1.6.1
 pandas==2.1.4
 python-slugify==8.0.1
 python-dotenv==1.0.0
+azure-search-documents==11.4.0b8
