@@ -28,7 +28,8 @@ class DocumentProcessor:
             ids.append(id_)
         return ids
 
-    def _create_document(self, chunk, keywords) -> Document:
+    @staticmethod
+    def _create_document(chunk, keywords) -> Document:
         wine_name = chunk.metadata.get("Wine Name")
         metadata = {
             "name": wine_name,
