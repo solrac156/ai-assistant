@@ -23,8 +23,8 @@ class KeywordsExtractor:
     ]
 
     def __init__(self):
-        self._key = os.environ.get("AZURE_KEY")
-        self._endpoint = os.environ.get("AZURE_ENDPOINT")
+        self._key = os.environ.get("AZURE_KEY_PHRASE_KEY")
+        self._endpoint = os.environ.get("AZURE_KEY_PHRASE_ENDPOINT")
         self._client = self._authenticate_client()
 
     def _authenticate_client(self):
@@ -37,12 +37,6 @@ class KeywordsExtractor:
     def extract(self, text: str) -> List[str]:
         try:
             response = self._client.extract_key_phrases(documents=[text])[0]
-            if not response.is_error:
-                print("Key Phrases")
-                for phrase in response.key_phrases:
-                    print(f"\t\t{phrase}")
-            else:
-                print(response.id, response.error)
             keywords = self._clean_keywords(response.key_phrases)
             return keywords
         except Exception as e:
