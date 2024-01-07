@@ -15,6 +15,7 @@ from services.embeddings import Embedder
 
 class VectorStore:
     def __init__(self):
+        self._embedder = Embedder()
         self._endpoint = os.environ.get("AZURE_SEARCH_ENDPOINT")
         self._api_key = os.environ.get("AZURE_SEARCH_API_KEY")
         self._index = os.environ.get("AZURE_SEARCH_INDEX")
@@ -22,7 +23,7 @@ class VectorStore:
             azure_search_endpoint=self._endpoint,
             azure_search_key=self._api_key,
             index_name=self._index,
-            embedding_function=Embedder.embed,
+            embedding_function=self._embedder.embed,
             semantic_configuration_name="config",
             semantic_settings=SemanticSettings(
                 default_configuration="config",
@@ -30,12 +31,12 @@ class VectorStore:
                     SemanticConfiguration(
                         name="config",
                         prioritized_fields=PrioritizedFields(
-                            title_field=SemanticField(field_name="wine_name"),
+                            title_field=SemanticField(field_name="name"),
                             prioritized_content_fields=[
-                                SemanticField(field_name="description")
+                                SemanticField(field_name="page_content")
                             ],
                             prioritized_keywords_fields=[
-                                SemanticField(field_name="metadata")
+                                SemanticField(field_name="keywords")
                             ],
                         ),
                     )
