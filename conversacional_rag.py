@@ -1,13 +1,14 @@
 from operator import itemgetter
 
 from dotenv import load_dotenv
-from langchain.schema import format_document
-from langchain_core.messages import AIMessage, HumanMessage, get_buffer_string
 from langchain.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain.prompts.prompt import PromptTemplate
+from langchain.schema import format_document
 from langchain_community.chat_models import ChatOpenAI
+from langchain_core.messages import HumanMessage, get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import SystemMessagePromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
 from services.vector_store import VectorStore
 
@@ -27,12 +28,15 @@ Standalone question:"""
 
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
+system_template = """You are an expert winemaker. You have vast knowledge about wines. You are friendly, helpfull, and funny."""
+system_prompt = SystemMessagePromptTemplate.from_template(system_template)
+
 template = """Answer the question based only on the following context:
 {context}
 
 Question: {question}
 """
-ANSWER_PROMPT = ChatPromptTemplate.from_template(template)
+ANSWER_PROMPT = ChatPromptTemplate.from_messages([system_prompt, template])
 
 DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
     template="{name}: [{category}][{subcategory}] {page_content}"
@@ -71,9 +75,4 @@ if __name__ == "__main__":
         )
         chat_history.append(HumanMessage(content=human_message))
         chat_history.append(ai_message)
-        for message in chat_history:
-            if type(message) == HumanMessage:
-                print("You: ", end="")
-            else:
-                print("Assistant: ", end="")
-            print(message.content)
+        print(get_buffer_string(chat_history))
