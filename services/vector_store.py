@@ -1,13 +1,15 @@
 import os
 from typing import List
 
-from langchain_community.vectorstores.azuresearch import AzureSearch
 from azure.search.documents.indexes.models import (
     SemanticSettings,
     SemanticConfiguration,
     SemanticField,
     PrioritizedFields,
+    SearchableField,
+    SearchFieldDataType,
 )
+from langchain_community.vectorstores.azuresearch import AzureSearch
 from langchain_core.documents import Document
 
 from services.embeddings import Embedder
@@ -25,6 +27,42 @@ class VectorStore:
             index_name=self._index,
             embedding_function=self._embedder.embed,
             semantic_configuration_name="config",
+            fields=[
+                SearchableField(
+                    name="name",
+                    type=SearchFieldDataType.String,
+                    filterable=True,
+                    sortable=True,
+                    searchable=True,
+                ),
+                SearchableField(
+                    name="content",
+                    type=SearchFieldDataType.String,
+                    filterable=True,
+                    sortable=True,
+                    searchable=True,
+                ),
+                SearchableField(
+                    name="category",
+                    type=SearchFieldDataType.String,
+                    filterable=True,
+                    sortable=True,
+                    searchable=True,
+                ),
+                SearchableField(
+                    name="subcategory",
+                    type=SearchFieldDataType.String,
+                    filterable=True,
+                    sortable=True,
+                    searchable=True,
+                ),
+                SearchableField(
+                    name="keywords",
+                    type=SearchFieldDataType.Collection(SearchFieldDataType.String),
+                    filterable=True,
+                    searchable=True,
+                ),
+            ],
             semantic_settings=SemanticSettings(
                 default_configuration="config",
                 configurations=[
@@ -33,7 +71,7 @@ class VectorStore:
                         prioritized_fields=PrioritizedFields(
                             title_field=SemanticField(field_name="name"),
                             prioritized_content_fields=[
-                                SemanticField(field_name="page_content")
+                                SemanticField(field_name="content")
                             ],
                             prioritized_keywords_fields=[
                                 SemanticField(field_name="keywords")
