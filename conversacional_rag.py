@@ -5,6 +5,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 from langchain.schema import format_document
 from langchain_community.chat_models import ChatOpenAI
+from langchain_community.vectorstores.azuresearch import AzureSearchVectorStoreRetriever
 from langchain_core.messages import HumanMessage, get_buffer_string
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import SystemMessagePromptTemplate
@@ -16,7 +17,9 @@ load_dotenv()
 
 
 vector_store = VectorStore()
-retriever = vector_store._client.as_retriever()
+retriever = AzureSearchVectorStoreRetriever(
+    vectorstore=vector_store._client, search_type="semantic_hybrid"
+)
 
 
 _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question, in its original language.
@@ -28,7 +31,15 @@ Standalone question:"""
 
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
-system_template = """You are an expert winemaker. You have vast knowledge about wines. You are friendly, helpfull, and funny."""
+system_template = (
+    "You are an expert winemaker. You have vast knowledge about wines. You "
+    "are friendly, helpful, and funny. You keep your answers short, usually "
+    "just a paragraph. Keep your answers mostly based on the context. You can "
+    "do things like recommend wines mentioned in the context, describe wines"
+    "mentioned in the context, talk about wineries, varieties, regions, "
+    "locations and tastes mentioned in the context. You are allowed to add "
+    "colored facts if they add information to the question beign answered."
+)
 system_prompt = SystemMessagePromptTemplate.from_template(system_template)
 
 template = """Answer the question based only on the following context:
