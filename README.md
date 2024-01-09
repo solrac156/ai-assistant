@@ -26,6 +26,7 @@ The project uses the following Python packages:
 - Azure Search Documents
 - Tiktoken
 - Azure Identity
+
 You can install the packages using pip:
 ```bash
 pip install -r requirements.txt
